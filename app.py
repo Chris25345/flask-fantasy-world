@@ -1,10 +1,9 @@
 import os
-import psycopg2
 from flask import Flask, render_template, request
 from math import ceil
 from flask_sqlalchemy import SQLAlchemy
 
-basic_query = 'SELECT humanoids.name, humanoids.gender, humanoids.age, races.name, occupations.name FROM humanoids INNER JOIN races ON humanoids.race_id=races.id INNER JOIN humanoids_occupations ON humanoids_occupations.humanoid_id=humanoids.id INNER JOIN occupations ON humanoids_occupations.occupation_id=occupations.id'
+# basic_query = 'SELECT humanoids.name, humanoids.gender, humanoids.age, races.name, occupations.name FROM humanoids INNER JOIN races ON humanoids.race_id=races.id INNER JOIN humanoids_occupations ON humanoids_occupations.humanoid_id=humanoids.id INNER JOIN occupations ON humanoids_occupations.occupation_id=occupations.id'
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://{user}:{pw}@{host}:{port}/{db}'.format(
   user=os.environ['DB_USERNAME'],
