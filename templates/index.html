@@ -6,7 +6,7 @@
 {% block body %}
 <div class="content">
   <h1 style="text-align: center;">Humanoids</h1>
-  <form action="{{cur_page}}/search" method="GET">
+  <form action="/search/{{cur_page}}" method="GET">
     <div class="select-box">
       <select name="race" id="race">
         <option disabled value="" selected>Races</option>
@@ -33,7 +33,7 @@
     </div>
   </form> 
 
-  <form action="{{cur_page}}/sort" method="GET">
+  <form action="/sort/{{cur_page}}" method="GET">
     <div class="select-box">
       <select name="sort" id="sort">
         <option disabled value="" selected>Sort by</option>
@@ -64,15 +64,51 @@
       </tr>
       {% endfor %}
     </table>
-    {% endif %}
     <div class='pagination-box'>
       <div class='pagination'>
         <p><</p>
-          {% for page in pages %}
-          <a class='pagination_btn' href="/{{page}}">{{page}}</a>
+          {% for link in links %}
+          <a class='pagination_btn' href="{{link.link}}">{{link.page}}</a>
           {% endfor %}
         <p>></p>
       </div>
-  </div>
+    </div>
+
+    <div class="tables">
+      <div class="table-box">
+        <h4 class="header">Humanoids in Occupations count</h4>
+        <table>
+          <tr>
+            <th>Servant</th>
+            <th>Merchant</th>
+            <th>Warrior</th>
+            <th>Scientist</th>
+          </tr>
+          <tr>
+            <td>{{world_info.servant_count}}</td>
+            <td>{{world_info.merchant_count}}</td>
+            <td>{{world_info.warrior_count}}</td>
+            <td>{{world_info.scientist_count}}</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="table-box">
+        <h4 class="header">Humanoids in Races count</h4>
+        <table>
+        <tr>
+          <th>Human</th>
+          <th>Dwarf</th>
+          <th>Elf</th>
+        </tr>
+        <tr>
+          <td>{{world_info.human_count}}</td>
+          <td>{{world_info.dwarf_count}}</td>
+          <td>{{world_info.elf_count}}</td>
+        </tr>
+        </table>
+      </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

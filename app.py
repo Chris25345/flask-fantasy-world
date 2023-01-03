@@ -46,6 +46,21 @@ class Humanoid:
     self.race = race
     self.occupation = occupation
 
+class Link:
+  def __init__(self, link, page):
+    self.link = link
+    self.page = page
+  
+class WorldInfo:
+  def __init__(self, servant_count, merchant_count, warrior_count, scientist_count, human_count, dwarf_count, elf_count):
+    self.servant_count = servant_count
+    self.merchant_count = merchant_count
+    self.warrior_count = warrior_count
+    self.scientist_count = scientist_count
+    self.human_count = human_count
+    self.dwarf_count = dwarf_count
+    self.elf_count = elf_count
+
 def format_humanoids(humanoids):
   humanoid_list = []
   for humanoid in humanoids:
@@ -67,18 +82,54 @@ def get_humanoids():
     .join(Races, Humanoids.race_id==Races.id)\
     .join(Humanoids_Occupations, Humanoids_Occupations.humanoid_id==Humanoids.id )\
     .join(Occupations, Humanoids_Occupations.occupation_id==Occupations.id)
+  
+def get_world_info(humanoids):
+  servant_count = 0
+  merchant_count = 0
+  warrior_count = 0 
+  scientist_count = 0
+  human_count = 0
+  dwarf_count = 0 
+  elf_count = 0
+
+  for humanoid in humanoids:
+    if humanoid.race:
+      if humanoid.race == 'Elf':
+        elf_count += 1
+      elif humanoid.race == 'Dwarf':
+        dwarf_count += 1
+      elif humanoid.race == 'Human':
+        human_count += 1
+    
+    if humanoid.occupation:
+      if humanoid.occupation == 'Servant':
+        servant_count += 1
+      elif humanoid.occupation == 'Merchant':
+        merchant_count += 1
+      elif humanoid.occupation == 'Warrior':
+        warrior_count += 1
+      elif humanoid.occupation == 'Scientist':
+        scientist_count += 1
+  
+  return WorldInfo(servant_count, merchant_count, warrior_count, scientist_count, human_count, dwarf_count, elf_count)
+
 
 @app.route('/',  methods=['GET'], defaults={"page": 1})
 @app.route('/<int:page>', methods=['GET'])
 def index(page):
   humanoids = get_humanoids().paginate(page=page,per_page=10,error_out=False)
   pages = get_pages(humanoids.total)
+  links = []
+  for page in pages:
+    links.append(Link(f'/{page}', page))
   humanoid_list = format_humanoids(humanoids.items)
-  return render_template('index.html',humanoids=humanoid_list,pages=pages,cur_page=humanoids.page)
+  world_info = get_world_info(humanoid_list)
+  return render_template('index.html',humanoids=humanoid_list,links=links,cur_page=humanoids.page, world_info=world_info)
 
 
-@app.route('/<int:page>/search', methods=['GET'], defaults={"page": 1})
+@app.route('/search/<int:page>', methods=['GET'])
 def search(page):
+  query_string = request.query_string.decode("utf-8")
   selected_race = request.args.get('race')
   selected_occupation = request.args.get('occupation')
   selected_gender = request.args.get('gender')
@@ -109,24 +160,33 @@ def search(page):
         humanoid_list = get_humanoids().paginate(page=page,per_page=10,error_out=False)
 
   pages = get_pages(humanoid_list.total)
+  links = []
+  for page in pages:
+    links.append(Link(f'/search/{page}?{query_string}', page))
   humanoids = format_humanoids(humanoid_list.items)
-  return render_template('index.html',humanoids=humanoids,pages=pages,cur_page=humanoid_list.page)
+  world_info = get_world_info(humanoids)
+  return render_template('index.html',humanoids=humanoids,links=links,cur_page=humanoid_list.page,world_info=world_info)
 
-@app.route('/<int:page>/sort', methods=['GET'], defaults={"page": 1})
+@app.route('/sort/<int:page>', methods=['GET'])
 def sort(page):
+  query_string = request.query_string.decode("utf-8")
   sort_choise = request.args.get('sort')
   humanoid_list = []
 
   if sort_choise == 'age':
-    humanoid_list = get_humanoids().order_by(Humanoids.age.desc()).paginate(page=page,per_page=10,error_out=False)
+    humanoid_list = get_humanoids().order_by(Humanoids.age.asc()).paginate(page=page,per_page=10,error_out=False)
   elif sort_choise == 'name':
-    humanoid_list = get_humanoids().order_by(Humanoids.name.desc()).paginate(page=page,per_page=10,error_out=False)
+    humanoid_list = get_humanoids().order_by(Humanoids.name.asc()).paginate(page=page,per_page=10,error_out=False)
   else:
     humanoid_list = get_humanoids().paginate(page=page,per_page=10,error_out=False)
   
   pages = get_pages(humanoid_list.total)
   humanoids = format_humanoids(humanoid_list.items)
-  return render_template('index.html',humanoids=humanoids,pages=pages,cur_page=humanoid_list.page)
+  world_info = get_world_info(humanoids)
+  links = []
+  for page in pages:
+    links.append(Link(f'/sort/{page}?{query_string}', page))
+  return render_template('index.html',humanoids=humanoids,links=links,cur_page=humanoid_list.page,world_info=world_info)
   
     
 if __name__ == "__main__":
