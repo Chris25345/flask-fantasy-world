@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock %}
+
+{% block body %}
+<div class="content">
+  <h1 style="text-align: center;">Humanoids</h1>
+  <form action="{{cur_page}}/search" method="GET">
+    <div class="select-box">
+      <select name="race" id="race">
+        <option disabled value="" selected>Races</option>
+        <option value="3">Human</option>
+        <option value="2">Dwarf</option>
+        <option value="1">Elf</option>
+      </select>
+
+      <select name="occupation" id="occupation">
+        <option disabled value="" selected>Occupations</option>
+        <option value="1">Servant</option>
+        <option value="2">Merchant</option>
+        <option value="3">Warrior</option>
+        <option value="4">Scientist</option>
+      </select>
+
+      <select name="gender" id="gender">
+        <option disabled value="" selected>Gender</option>
+        <option value="1">Female</option>
+        <option value="2">Male</option>
+      </select>
+      
+      <button type="submit">Filter</button>
+    </div>
+  </form> 
+
+  <form action="{{cur_page}}/sort" method="GET">
+    <div class="select-box">
+      <select name="sort" id="sort">
+        <option disabled value="" selected>Sort by</option>
+        <option value="age">Age</option>
+        <option value="name">Name</option>
+      </select>
+      
+      <button type="submit">Sort</button>
+    </div>
+  </form>
+  {% if humanoids|length < 1 %} <h4 style="text-align: center;">No humanoids found</h4>
+    {% else %}
+    <table>
+      <tr>
+        <th>Name</th>
+        <th>Gender</th>
+        <th>Age</th>
+        <th>Race</th>
+        <th>Occupation</th>
+      </tr>
+      {% for humanoid in humanoids %}
+      <tr>
+        <td>{{humanoid.name}}</td>
+        <td>{{humanoid.gender}}</td>
+        <td>{{humanoid.age}}</td>
+        <td>{{humanoid.race}}</td>
+        <td>{{humanoid.occupation}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% endif %}
+    <div class='pagination-box'>
+      <div class='pagination'>
+        <p><</p>
+          {% for page in pages %}
+          <a class='pagination_btn' href="/{{page}}">{{page}}</a>
+          {% endfor %}
+        <p>></p>
+      </div>
+  </div>
+</div>
+{% endblock %}
